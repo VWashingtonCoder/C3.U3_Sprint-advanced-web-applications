@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PT from 'prop-types'
+import { useEffect } from 'react'
 
 const initialFormValues = {
   username: '',
@@ -7,8 +8,10 @@ const initialFormValues = {
 }
 export default function LoginForm(props) {
   const [values, setValues] = useState(initialFormValues)
+  const [disabled, setDisabled] = useState(true)
   // ✨ where are my props? Destructure them here
-
+  const { login } = props
+  console.log(values)
   const onChange = evt => {
     const { id, value } = evt.target
     setValues({ ...values, [id]: value })
@@ -17,6 +20,7 @@ export default function LoginForm(props) {
   const onSubmit = evt => {
     evt.preventDefault()
     // ✨ implement
+    login(values)
   }
 
   const isDisabled = () => {
@@ -25,7 +29,11 @@ export default function LoginForm(props) {
     // trimmed password must be >= 8 for
     // the button to become enabled
   }
-
+  
+  useEffect(() => {
+    isDisabled({ values })
+  }, [values])
+  
   return (
     <form id="loginForm" onSubmit={onSubmit}>
       <h2>Login</h2>
@@ -43,7 +51,7 @@ export default function LoginForm(props) {
         placeholder="Enter password"
         id="password"
       />
-      <button disabled={isDisabled()} id="submitCredentials">Submit credentials</button>
+      <button disabled={!disabled} id="submitCredentials">Submit credentials</button>
     </form>
   )
 }
