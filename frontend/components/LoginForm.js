@@ -10,6 +10,7 @@ export default function LoginForm(props) {
   const [values, setValues] = useState(initialFormValues)
   const [disabled, setDisabled] = useState(true)
   // ✨ where are my props? Destructure them here
+  
   const { login } = props
   console.log(values)
   const onChange = evt => {
@@ -28,11 +29,16 @@ export default function LoginForm(props) {
     // Trimmed username must be >= 3, and
     // trimmed password must be >= 8 for
     // the button to become enabled
+    values.username.trim().length >= 3 
+      && values.password.trim().length >= 8 
+      ? setDisabled(false)
+      : setDisabled(true)
   }
   
   useEffect(() => {
-    isDisabled({ values })
+    isDisabled()
   }, [values])
+
   
   return (
     <form id="loginForm" onSubmit={onSubmit}>
@@ -51,7 +57,7 @@ export default function LoginForm(props) {
         placeholder="Enter password"
         id="password"
       />
-      <button disabled={!disabled} id="submitCredentials">Submit credentials</button>
+      <button disabled={disabled} id="submitCredentials">Submit credentials</button>
     </form>
   )
 }
