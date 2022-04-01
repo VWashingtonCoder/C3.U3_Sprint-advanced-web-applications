@@ -47,13 +47,14 @@ export default function App() {
     axios.post(loginUrl, { username, password })
       .then(res => {
         setMessage(res.data.message)
-        setSpinnerOn(false)
         const token = res.data.token
         window.localStorage.setItem('token', token)
         redirectToArticles()
       })
       .catch(err => {
         setMessage(err.response.data.message)
+      })
+      .finally(() => {
         setSpinnerOn(false)
       })
   }
@@ -73,11 +74,12 @@ export default function App() {
       .then(res => {
         setArticles(res.data.articles)
         setMessage(res.data.message)
-        setSpinnerOn(false)
       })
       .catch(err => {
         setMessage(err.response.data.message)
         redirectToLogin()
+      })
+      .finally(() => {
         setSpinnerOn(false)
       })
   }
@@ -91,13 +93,13 @@ export default function App() {
     setSpinnerOn(true)
     axiosWithAuth().post(articlesUrl, article)
       .then(res => {
-        console.log(res.data)
         setArticles([...articles, res.data.article])
         setMessage(res.data.message)
-        setSpinnerOn(false)
       })
       .catch(err => {
         setMessage(err.response.data.message)
+      })
+      .finally(() => {
         setSpinnerOn(false)
       })
   }
@@ -105,22 +107,21 @@ export default function App() {
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
-    console.log({ article_id, article })
     setMessage('')
     setSpinnerOn(true)
     axiosWithAuth().put(`${articlesUrl}/${article_id}`, article)
     .then(res => {
-      console.log(res.data)
       setArticles(articles.map(art => {
         return art.article_id === article_id 
         ? res.data.article
         : art
       }))
       setMessage(res.data.message)
-      setSpinnerOn(false)
     })
     .catch(err => {
       setMessage(err.response.data.message)
+    })
+    .finally(() => {
       setSpinnerOn(false)
     })
   }
@@ -132,9 +133,15 @@ export default function App() {
     axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
       .then(res => {
         console.log(res.data)
+        setMessage(res.data.message)
+        setArticles(articles.filter(art => {
+          return art.article_id !== article_id
+        }))
       })
       .catch(err => {
-        setMessage(err.response.data.message)
+        setMessage(err.response.data.message) 
+      })
+      .finally(() => {
         setSpinnerOn(false)
       })
   }
