@@ -17,7 +17,7 @@ export default function App() {
   const [articles, setArticles] = useState([])
   const [currentArticleId, setCurrentArticleId] = useState()
   const [spinnerOn, setSpinnerOn] = useState(false)
-
+ 
   // ✨ Research `useNavigate` in React Router v.6
   const navigate = useNavigate()
   const redirectToLogin = () => { navigate("/") }
@@ -92,9 +92,13 @@ export default function App() {
     axiosWithAuth().post(articlesUrl, article)
       .then(res => {
         console.log(res.data)
+        setArticles([...articles, res.data.article])
+        setMessage(res.data.message)
+        setSpinnerOn(false)
       })
       .catch(err => {
-        console.log(err.response.data)
+        setMessage(err.response.data.message)
+        setSpinnerOn(false)
       })
   }
 
@@ -108,7 +112,8 @@ export default function App() {
       console.log(res.data)
     })
     .catch(err => {
-      console.log(err.response.data)
+      setMessage(err.response.data.message)
+      setSpinnerOn(false)
     })
   }
 
@@ -121,7 +126,8 @@ export default function App() {
         console.log(res.data)
       })
       .catch(err => {
-        console.log(err.response.data)
+        setMessage(err.response.data.message)
+        setSpinnerOn(false)
       })
   }
 
@@ -144,11 +150,12 @@ export default function App() {
               <ArticleForm 
                 postArticle={postArticle}
                 currentArticle={articles.find(art => art.article_id === currentArticleId)}
+                updateArticle={updateArticle}
               />
               <Articles 
                 articles={articles} 
                 getArticles={getArticles}
-                updateArticle={updateArticle} 
+                setCurrentArticleId={setCurrentArticleId}
                 deleteArticle={deleteArticle}
               />
             </>

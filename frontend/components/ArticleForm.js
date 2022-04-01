@@ -5,15 +5,17 @@ const initialFormValues = { title: '', text: '', topic: '' }
 
 export default function ArticleForm(props) {
   const [values, setValues] = useState(initialFormValues)
+  const [disabled, setDisabled] = useState(true)
   // ✨ where are my props? Destructure them here
-  const { postArticle, currentArticle } = props
-
+  const { postArticle, currentArticle, updateArticle } = props
+  
   useEffect(() => {
     // ✨ implement
     // Every time the `currentArticle` prop changes, we should check it for truthiness:
     // if it's truthy, we should set its title, text and topic into the corresponding
     // values of the form. If it's not, we should reset the form back to initial values.
-  })
+    setValues(currentArticle || initialFormValues)
+  }, [currentArticle])
 
   const onChange = evt => {
     const { id, value } = evt.target
@@ -25,12 +27,27 @@ export default function ArticleForm(props) {
     // ✨ implement
     // We must submit a new post or update an existing one,
     // depending on the truthyness of the `currentArticle` prop.
+    if(currentArticle){
+      const id = currentArticle.article_id
+      console.log(id)
+      updateArticle({ id, values })
+    } else {
+      postArticle(values)
+    }
+    setValues(initialFormValues)
   }
 
   const isDisabled = () => {
     // ✨ implement
     // Make sure the inputs have some values
+    values.title && values.text && values.topic
+    ? setDisabled(false)
+    : setDisabled(true)
   }
+
+  useEffect(() => {
+    isDisabled()
+  }, [values])
 
   return (
     // ✨ fix the JSX: make the heading display either "Edit" or "Create"
@@ -58,8 +75,8 @@ export default function ArticleForm(props) {
         <option value="Node">Node</option>
       </select>
       <div className="button-group">
-        <button disabled={isDisabled()} id="submitArticle">Submit</button>
-        <button onClick={Function.prototype}>Cancel edit</button>
+        <button disabled={disabled} id="submitArticle">Submit</button>
+        <button onClick={evt => setValues(initialFormValues)}>Cancel edit</button>
       </div>
     </form>
   )
