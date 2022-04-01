@@ -12,7 +12,6 @@ export default function LoginForm(props) {
   // ✨ where are my props? Destructure them here
   
   const { login } = props
-  console.log(values)
   const onChange = evt => {
     const { id, value } = evt.target
     setValues({ ...values, [id]: value })
