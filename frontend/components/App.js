@@ -29,9 +29,9 @@ export default function App() {
     // and a message saying "Goodbye!" should be set in its proper state.
     // In any case, we should redirect the browser back to the login screen,
     // using the helper above.
-    window.localStorage.removeItem('token')
-    setMessage('Goodbye!')
-    redirectToLogin()
+      window.localStorage.removeItem('token')
+      setMessage('Goodbye!')
+      redirectToLogin()
   }
 
   const login = ({ username, password }) => {
@@ -46,7 +46,6 @@ export default function App() {
     
     axios.post(loginUrl, { username, password })
       .then(res => {
-        console.log(res)
         setMessage(res.data.message)
         setSpinnerOn(false)
         const token = res.data.token
@@ -68,6 +67,19 @@ export default function App() {
     // If something goes wrong, check the status of the response:
     // if it's a 401 the token might have gone bad, and we should redirect to login.
     // Don't forget to turn off the spinner!
+    setMessage('')
+    setSpinnerOn(true)
+    axiosWithAuth().get(articlesUrl)
+      .then(res => {
+        setArticles(res.data.articles)
+        setMessage(res.data.message)
+        setSpinnerOn(false)
+      })
+      .catch(err => {
+        setMessage(err.response.data.message)
+        redirectToLogin()
+        setSpinnerOn(false)
+      })
   }
 
   const postArticle = article => {
@@ -75,15 +87,42 @@ export default function App() {
     // The flow is very similar to the `getArticles` function.
     // You'll know what to do! Use log statements or breakpoints
     // to inspect the response from the server.
+    setMessage('')
+    setSpinnerOn(true)
+    axiosWithAuth().post(articlesUrl, article)
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(err => {
+        console.log(err.response.data)
+      })
   }
 
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
+    setMessage('')
+    setSpinnerOn(true)
+    axiosWithAuth().put(`${articlesUrl}/${article_id}`, article)
+    .then(res => {
+      console.log(res.data)
+    })
+    .catch(err => {
+      console.log(err.response.data)
+    })
   }
 
   const deleteArticle = article_id => {
     // ✨ implement
+    setMessage('')
+    setSpinnerOn(true)
+    axiosWithAuth().delete(`${articlesUrl}/${article_id}`)
+      .then(res => {
+        console.log(res.data)
+      })
+      .catch(err => {
+        console.log(err.response.data)
+      })
   }
 
   return (
@@ -102,8 +141,16 @@ export default function App() {
           <Route path="/" element={<LoginForm login={login} />} />
           <Route path="articles" element={
             <>
-              <ArticleForm />
-              <Articles />
+              <ArticleForm 
+                postArticle={postArticle}
+                currentArticle={articles.find(art => art.article_id === currentArticleId)}
+              />
+              <Articles 
+                articles={articles} 
+                getArticles={getArticles}
+                updateArticle={updateArticle} 
+                deleteArticle={deleteArticle}
+              />
             </>
           } />
         </Routes>
