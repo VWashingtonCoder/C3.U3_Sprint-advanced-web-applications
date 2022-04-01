@@ -105,11 +105,19 @@ export default function App() {
   const updateArticle = ({ article_id, article }) => {
     // ✨ implement
     // You got this!
+    console.log({ article_id, article })
     setMessage('')
     setSpinnerOn(true)
     axiosWithAuth().put(`${articlesUrl}/${article_id}`, article)
     .then(res => {
       console.log(res.data)
+      setArticles(articles.map(art => {
+        return art.article_id === article_id 
+        ? res.data.article
+        : art
+      }))
+      setMessage(res.data.message)
+      setSpinnerOn(false)
     })
     .catch(err => {
       setMessage(err.response.data.message)
@@ -151,6 +159,7 @@ export default function App() {
                 postArticle={postArticle}
                 currentArticle={articles.find(art => art.article_id === currentArticleId)}
                 updateArticle={updateArticle}
+                setCurrentArticleId={setCurrentArticleId}
               />
               <Articles 
                 articles={articles} 
